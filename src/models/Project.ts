@@ -1,6 +1,6 @@
 import Sequelize from "sequelize";
 import { sequelize } from "../database/database";
-import Tasks from "./Tasks";
+import Task from "./Tasks";
 
 const Project = sequelize.define("project", {
   id: {
@@ -23,6 +23,7 @@ const Project = sequelize.define("project", {
   timestamps: false,
 });
 
-Project.hasMany(Tasks, { foreignKey: "projectId" });
+Project.hasMany(Task, { foreignKey: "projectId", sourceKey: "id" }); // foreignKey es en donde se pone el valor de la columna de la tabla Tasks y sourceKey es de donde se pone ese valor en la columna de Task proveniente de Project.id
+Task.belongsTo(Project, { foreignKey: "projectId", targetKey: "id" });
 
 export default Project;
