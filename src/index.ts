@@ -17,3 +17,17 @@
 // // babel-node --extensions \".ts\" index.ts
 // // webpack --mode=development --config ./webpack.config.js && node ./dist/bundle.js
  
+import app from "./app";
+
+async function main() {
+  let port = process.env.PORT || 3000;
+  if (process.env.NODE_ENV !== 'dev') {
+    await app.listen(port, () => {
+      console.log(`Listening on port ${port}`);
+    })
+  }
+}
+
+main().catch(err => console.log(err));
+
+export const viteNodeApp = app;

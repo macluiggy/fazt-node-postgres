@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node dist/index.js",
     "build": "vite build",
-    "dev": "vite dev"
+    "dev": "nodemon"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +24,7 @@
     "@types/express": "^4.17.13",
     "@types/morgan": "^1.9.3",
     "@types/node": "^17.0.23",
+    "nodemon": "^2.0.15",
     "vite": "^2.8.6",
     "vite-plugin-node": "^0.0.19",
     "vite-plugin-vite": "^0.1.0"
