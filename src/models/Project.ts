@@ -1,23 +1,28 @@
-import Sequilize from "sequelize";
+import Sequelize from "sequelize";
 import { sequelize } from "../database/database";
+import Tasks from "./Tasks";
 
-const project = sequelize.define("project", {
+const Project = sequelize.define("project", {
   id: {
-    type: Sequilize.INTEGER,
+    type: Sequelize.INTEGER,
     primaryKey: true,
   },
   name: {
-    type: Sequilize.TEXT,
+    type: Sequelize.TEXT,
   },
   priority: {
-    type: Sequilize.INTEGER,
+    type: Sequelize.INTEGER,
   },
   description: {
-    type: Sequilize.TEXT,
+    type: Sequelize.TEXT,
   },
   deliverydate: {
-    type: Sequilize.DATE,
+    type: Sequelize.DATE,
   },
+}, {
+  timestamps: false,
 });
 
-export default project;
+Project.hasMany(Tasks, { foreignKey: "projectId" });
+
+export default Project;
