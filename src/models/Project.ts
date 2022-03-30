@@ -23,7 +23,7 @@ const Project = sequelize.define("project", {
   timestamps: false,
 });
 
-Project.hasMany(Task, { foreignKey: "projectId", sourceKey: "id" }); // foreignKey es en donde se pone el valor de la columna de la tabla Tasks y sourceKey es de donde se pone ese valor en la columna de Task proveniente de Project.id
-Task.belongsTo(Project, { foreignKey: "projectId", targetKey: "id" });
+Project.hasMany(Task, { foreignKey: "projectid", sourceKey: "id" }); // foreignKey es en donde se pone el valor de la columna de la tabla Tasks y sourceKey es de donde se pone ese valor en la columna de Task proveniente de Project.id
+Task.belongsTo(Project, { foreignKey: "projectid", targetKey: "id" });
 
 export default Project;
