@@ -1,18 +1,28 @@
-import { Handler } from "./types";
+import { RequestWithProjectId, TProject } from "./types";
 import Project from "../models/Project";
+import { Model } from "sequelize/types";
+import {
+  NextFunction,
+  RequestHandler,
+  RequestParamHandler,
+  Response,
+} from "express";
 
-const createProject: Handler = async (req, res) => {
+const createProject: RequestHandler = async (req, res) => {
   try {
     console.log(req.body);
     const { name, priority, deliverydate, description, id } = req.body;
-    let newProject = await Project.create({
-      name,
-      priority,
-      deliverydate,
-      description,
-    }, {
-      fields: ["name", "priority", "deliverydate", "description"],
-    });
+    let newProject = await Project.create(
+      {
+        name,
+        priority,
+        deliverydate,
+        description,
+      },
+      {
+        fields: ["name", "priority", "deliverydate", "description"],
+      }
+    );
 
     if (!newProject) {
       res.status(400).json({
@@ -29,11 +39,11 @@ const createProject: Handler = async (req, res) => {
     return res.status(500).json({
       ok: false,
       message: "Error creating project",
-      
-    })
+    });
   }
 };
-const getProjects: Handler = async (req, res) => {
+
+const getProjects: RequestHandler = async (req, res) => {
   try {
     const projects = await Project.findAll({
       attributes: ["id", "name", "priority", "deliverydate", "description"],
@@ -53,8 +63,121 @@ const getProjects: Handler = async (req, res) => {
     return res.status(500).json({
       ok: false,
       message: "Error getting projects",
-    })
+    });
   }
-}
+};
 
-export { createProject, getProjects };
+const deleteProject = async (req: RequestWithProjectId, res: Response) => {
+  try {
+    const project = req.project!;
+    if (!project) {
+      res.status(400).json({
+        ok: false,
+        message: "Error deleting project",
+      });
+    }
+    const rowCount = await project.destroy();
+    // const rowCount =  await Project.destroy({where: {id: project.id}});
+    return res.json({
+      message: "Project deleted successfully",
+      dataDeleted: project,
+      rowCount,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error deleting project",
+    });
+  }
+};
+
+const getOneProject = async (req: RequestWithProjectId, res: Response) => {
+  try {
+    const project = req.project;
+    if (!project) {
+      return res.status(400).json({
+        ok: false,
+        message: "Error getting project",
+      });
+    }
+    return res.send({
+      message: "Project retrieved successfully",
+      data: project,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error getting project",
+    });
+  }
+};
+
+const updateProject = async (req: RequestWithProjectId, res: Response) => {
+  try {
+    const project = req.project!;
+    if (!project) {
+      res.status(400).json({
+        ok: false,
+        message: "Error updating project, project not found",
+      });
+    }
+    const { name, priority, deliverydate, description } = req.body;
+    await project.update({
+      name,
+      priority,
+      deliverydate,
+      description,
+    });
+    return res.json({
+      message: "Project updated successfully",
+      data: project,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error updating project",
+    });
+  }
+};
+
+const projectById = async (
+  req: RequestWithProjectId,
+  res: Response,
+  next: NextFunction,
+  id: number
+) => {
+  try {
+    const project = await Project.findOne<Model<TProject>>({
+      where: { id },
+      // attributes: ["id", "name", "priority", "deliverydate", "description"],
+    });
+    if (!project) {
+      return res.status(400).json({
+        ok: false,
+        message: `Error getting project, project with id ${id} not found`,
+      });
+    }
+    req.project = project!;
+    // return res.json({
+    //   msg: req.project
+    // })
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error getting project",
+    });
+  }
+};
+export {
+  createProject,
+  getProjects,
+  projectById,
+  getOneProject,
+  deleteProject,
+  updateProject,
+};
