@@ -47,7 +47,31 @@ const getTasks: RequestHandler = async (req, res) => {
   }
 };
 
-const getOneTask: RequestHandler = async (req, res) => {};
+const getOneTask: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await Task.findOne({
+      where: { id },
+      attributes: ["id", "name", "done", "projectid"],
+    });
+    if (!task) {
+      return res.status(404).json({
+        ok: false,
+        message: "Task not found",
+      });
+    }
+    return res.json({
+      message: "Task retrieved successfully",
+      data: task,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error getting task",
+    });
+  }
+};
 
 const updateTask: RequestHandler = async (req, res) => {
   try {
@@ -64,12 +88,13 @@ const updateTask: RequestHandler = async (req, res) => {
         fields: ["name", "done", "projectid"],
       }
     );
-    if (updateTask[0] === 0) {
+    if ( !updatedTask[0] ) {
       return res.status(404).json({
         ok: false,
         message: "Task not found",
       });
     }
+
     return res.json({
       message: "Task updated successfully",
       data: updatedTask,
@@ -103,7 +128,33 @@ const deleteTask: RequestHandler = async (req, res) => {
   }
 };
 
-const getTaskByProject: RequestHandler = async (req, res) => {};
+const getTaskByProject: RequestHandler = async (req, res) => {
+  try {
+    const { projectid } = req.params;
+    const tasks = await Task.findAll({
+      where: { projectid },
+      attributes: ["id", "name", "done", "projectid"],
+      order: [["id", "ASC"]],
+    });
+    if (!tasks) {
+      return res.status(404).json({
+        ok: false,
+        message: `No tasks found for project with id: ${projectid}`,
+      });
+      
+    }
+    return res.json({
+      message: "Tasks retrieved successfully",
+      data: tasks,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error getting tasks",
+    });
+  }
+};
 
 export {
   createTask,
