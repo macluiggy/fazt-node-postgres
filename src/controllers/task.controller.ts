@@ -4,62 +4,112 @@ import Task from "../models/Tasks";
 const createTask: RequestHandler = async (req, res) => {
   try {
     const { name, done, projectid } = req.body;
-    let newTask = await Task.create({
-      name,
-      done,
-      projectid,
-    }, {
-      fields: ["name", "done", "projectid"],
-    })
+    let newTask = await Task.create(
+      {
+        name,
+        done,
+        projectid,
+      },
+      {
+        fields: ["name", "done", "projectid"],
+      }
+    );
 
     return res.json({
       message: "Task created successfully",
       data: newTask,
-    })
-
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       ok: false,
       message: "Error creating task",
-    })
-    
+    });
   }
-}
+};
 
 const getTasks: RequestHandler = async (req, res) => {
   try {
     const tasks = await Task.findAll({
       attributes: ["id", "name", "done", "projectid"],
-      
-    })
+      order: [["id", "ASC"]],
+    });
     return res.json({
       message: "Tasks retrieved successfully",
       data: tasks,
-    })
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       ok: false,
       message: "Error getting tasks",
-    })
+    });
   }
-}
+};
 
-const  getOneTask: RequestHandler = async (req, res) => {
-
-}
+const getOneTask: RequestHandler = async (req, res) => {};
 
 const updateTask: RequestHandler = async (req, res) => {
-
-}
+  try {
+    const { id } = req.params;
+    const { name, done, projectid } = req.body;
+    const updatedTask = await Task.update(
+      {
+        name,
+        done,
+        projectid,
+      },
+      {
+        where: { id },
+        fields: ["name", "done", "projectid"],
+      }
+    );
+    if (updateTask[0] === 0) {
+      return res.status(404).json({
+        ok: false,
+        message: "Task not found",
+      });
+    }
+    return res.json({
+      message: "Task updated successfully",
+      data: updatedTask,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error updating task",
+    });
+  }
+};
 
 const deleteTask: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    await Task.destroy({
+      where: {
+        id,
+      },
+    });
+    return res.json({
+      message: "Task deleted successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      ok: false,
+      message: "Error deleting task",
+    });
+  }
+};
 
-}
+const getTaskByProject: RequestHandler = async (req, res) => {};
 
-const getTaskByProject: RequestHandler = async (req, res) => {
-
-}
-
-export { createTask, getOneTask, updateTask, deleteTask, getTaskByProject };
+export {
+  createTask,
+  getOneTask,
+  updateTask,
+  deleteTask,
+  getTaskByProject,
+  getTasks,
+};
